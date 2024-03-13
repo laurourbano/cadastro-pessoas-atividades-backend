@@ -1,0 +1,25 @@
+{
+  "extends": ["tslint:recommended"],
+  "jsRules": {
+    "no-empty": true
+  },
+  "rules": {
+    "no-console": false,
+    "no-empty": false,
+    "no-string-literal": false,
+    "no-implicit-dependencies": false,
+    "no-submodule-imports": false,
+    "no-unnecessary-type-assertion": false,
+    "no-unnecessary-callback-wrapper": false,
+    "no-unnecessary-else": false,
+    "no-unnecessary-initializer": false,
+    "no-unnecessary-qualifier": false
+  },
+  "rulesDirectory": [
+    "node_modules/codelyzer",
+    "node_modules/tslint-consistent-codestyle",
+    "node_modules/tslint-eslint-rules",
+    "node_modules/tslint-microsoft-contrib",
+    "node_modules/tslint-misc-rules"
+  ]
+}
