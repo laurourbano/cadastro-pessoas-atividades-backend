@@ -15,44 +15,52 @@ export class UserController {
     }
   }
 
-  public async getUser(req: Request, res: Response): Promise<void> {
+  static async getUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const user = await User.findByPk(id);
+      const user = await sequelize.query("SELECT * FROM users WHERE id = ?", {
+        replacements: [id],
+        type: QueryTypes.SELECT,
+      });
       res.status(200).json(user);
     } catch (error) {
       res.status(400).json(error);
     }
   }
 
-  public async createUser(req: Request, res: Response): Promise<void> {
+  static async createUser(req: Request, res: Response): Promise<void> {
     try {
-      const { name, email, password } = req.body;
-      const user = await User.create({
-        name,
-        email,
-        password,
-      });
+      const { name, telefone, email, endereco, password, idActivities } =
+        req.body;
+      const user = await sequelize.query(
+        "INSERT INTO users (name, telefone, email, endereco, password, idActivities) VALUES (?, ?, ?, ?, ?, ?)",
+        {
+          replacements: [
+            name,
+            telefone,
+            email,
+            endereco,
+            password,
+            idActivities,
+          ],
+          type: QueryTypes.INSERT,
+        }
+      );
       res.status(201).json(user);
     } catch (error) {
       res.status(400).json(error);
     }
   }
 
-  public async updateUser(req: Request, res: Response): Promise<void> {
+  static async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const { name, email, password } = req.body;
-      await User.update(
+      await sequelize.query(
+        "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?",
         {
-          name,
-          email,
-          password,
-        },
-        {
-          where: {
-            id,
-          },
+          replacements: [name, email, password, id],
+          type: QueryTypes.UPDATE,
         }
       );
       res.status(204).end();
@@ -61,13 +69,12 @@ export class UserController {
     }
   }
 
-  public async deleteUser(req: Request, res: Response): Promise<void> {
+  static async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      await User.destroy({
-        where: {
-          id,
-        },
+      await sequelize.query("DELETE FROM users WHERE id = ?", {
+        replacements: [id],
+        type: QueryTypes.DELETE,
       });
       res.status(204).end();
     } catch (error) {
