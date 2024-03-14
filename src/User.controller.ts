@@ -1,8 +1,9 @@
-import { User } from "./User.model";
 import { Request, Response } from "express";
 import sequelize from "./database/conection";
 import { QueryTypes } from "sequelize";
-const jwt = require("jsonwebtoken");
+import { User } from "./User.model";
+import * as bcrypt from "bcrypt";
+const jwt = require("jsonwebtoken"); // Biblioteca para JWT
 
 export class UserController {
   static async generateToken(
@@ -68,32 +69,28 @@ export class UserController {
 
   static async createUser(req: Request, res: Response): Promise<void> {
     try {
-      const { id, name, telefone, email, endereco, password, idActivities } = req.body;
-      const token = await UserController.generateToken(
-        { id, name },
-        process.env.SECRET,
+      const { name, telefone, email, endereco, password, idActivities } =
+        req.body;
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const user = {
+        name: req.body.name,
+        telefone: req.body.telefone,
+        email: req.body.email,
+        endereco: req.body.endereco,
+        password: hashedPassword,
+        idActivities: req.body.idActivities,
+      };
+      await sequelize.query(
+        "INSERT INTO users (name, telefone, email, endereco, password, idActivities) VALUES (:name, :telefone, :email, :endereco, :password, :idActivities)",
         {
-          expiresIn: 86400,
-        }
-      );
-      res.status(200).json({ token });
-      const user = await sequelize.query(
-        "INSERT INTO users (name, telefone, email, endereco, password, idActivities) VALUES (?, ?, ?, ?, ?, ?)",
-        {
-          replacements: [
-            name,
-            telefone,
-            email,
-            endereco,
-            password,
-            idActivities,
-          ],
+          replacements: user,
           type: QueryTypes.INSERT,
         }
       );
-      res.status(201).end(user);
+      res.status(201).json({ message: "User created successfully!" });
     } catch (error: any) {
-      res.status(400).json(error);
+      res.status(400).json({ error: error.message });
     }
   }
 }
