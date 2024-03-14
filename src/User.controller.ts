@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import sequelize from "./database/conection";
 import { QueryTypes } from "sequelize";
-import { User } from "./User.model";
 import * as bcrypt from "bcrypt";
 const jwt = require("jsonwebtoken"); // Biblioteca para JWT
 
