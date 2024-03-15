@@ -1,7 +1,7 @@
 import { Router, Application } from "express";
-import { UserController } from "./User.controller";
-import { ActivityController } from "./Activity.controller";
-import { LoginController } from "./Login.controller";
+import { UserController } from "../controllers/User.controller";
+import { ActivityController } from "../controllers/Activity.controller";
+import { LoginController } from "../controllers/Login.controller";
 
 const router = Router();
 

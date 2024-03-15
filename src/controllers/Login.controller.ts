@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import sequelize from "./database/conection";
+import sequelize from "../database/conection";
 import { QueryTypes } from "sequelize";
 import bcrypt from "bcrypt";
 
