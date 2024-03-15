@@ -1,47 +1,46 @@
 import { Request, Response } from "express";
 import sequelize from "./database/conection";
 import { QueryTypes } from "sequelize";
+import bcrypt from "bcrypt";
 
 export class LoginController {
   static async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
       const user = await sequelize.query(
-        "SELECT * FROM users WHERE email = ? AND password = ?",
+        "SELECT * FROM users WHERE email = :email",
         {
-          replacements: [email, password],
+          replacements: { email },
           type: QueryTypes.SELECT,
         }
       );
-      if (user.length > 0) {
-        res.status(200).json(user);
-      } else {
-        res.status(401).end();
+      if (!user) {
+        res.status(400).json({ message: "Usuário não encontrado" });
+        return;
       }
+
+      interface User {
+        password: string;
+      }
+
+      const match = await bcrypt.compare(
+        password.trim(),
+        (user[0] as User).password.trim()
+      );
+      if (!match) {
+        res.status(400).json({ message: "Dados inválidos" });
+        return;
+      }
+
+      res.status(200).json({ message: "sucesso" });
     } catch (error: any) {
-      res.status(400).json(error);
+      res.status(401).json("Error: ");
     }
   }
 
   static async logout(req: Request, res: Response): Promise<void> {
     try {
       res.status(200).end();
-    } catch (error: any) {
-      res.status(400).json(error);
-    }
-  }
-
-  static async register(req: Request, res: Response): Promise<void> {
-    try {
-      const { email, password } = req.body;
-      await sequelize.query(
-        "INSERT INTO users (email, password) VALUES (?, ?)",
-        {
-          replacements: [email, password],
-          type: QueryTypes.INSERT,
-        }
-      );
-      res.status(201).end();
     } catch (error: any) {
       res.status(400).json(error);
     }

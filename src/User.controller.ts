@@ -68,8 +68,7 @@ export class UserController {
 
   static async createUser(req: Request, res: Response): Promise<void> {
     try {
-      const { name, telefone, email, endereco, password, idActivities } =
-        req.body;
+      const { name, telefone, email, endereco, password } = req.body;
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       const user = {
@@ -78,16 +77,15 @@ export class UserController {
         email: req.body.email,
         endereco: req.body.endereco,
         password: hashedPassword,
-        idActivities: req.body.idActivities,
       };
       await sequelize.query(
-        "INSERT INTO users (name, telefone, email, endereco, password, idActivities) VALUES (:name, :telefone, :email, :endereco, :password, :idActivities)",
+        "INSERT INTO users (name, telefone, email, endereco, password) VALUES (:name, :telefone, :email, :endereco, :password)",
         {
           replacements: user,
           type: QueryTypes.INSERT,
         }
       );
-      res.status(201).json({ message: "User created successfully!" });
+      res.status(201).end();
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
