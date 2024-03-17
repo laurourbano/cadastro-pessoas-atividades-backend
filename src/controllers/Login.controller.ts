@@ -24,7 +24,7 @@ export class LoginController {
         res.status(401).json({ message: "Invalid password" });
         return;
       }
-      res.status(200).json({ message: "Login successful" });
+      res.status(200).json({ message: (user[0] as UserModel).id });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }

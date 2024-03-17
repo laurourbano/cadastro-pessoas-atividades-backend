@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import sequelize from "../database/conection";
 import { QueryTypes } from "sequelize";
+import { ActivityModel } from "../models/ActivityModel";
 
 export class ActivityController {
+  
   static async getActivities(req: Request, res: Response): Promise<void> {
     try {
       const activities = await sequelize.query("SELECT * FROM activities", {
@@ -87,19 +89,22 @@ export class ActivityController {
     res: Response,
   ): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params;     
       const activities = await sequelize.query(
         `SELECT name, description, start_date, end_date
         FROM activities ac
         JOIN pessoaatividade pa ON(ac.id = pa.idActivity)
         WHERE pa.idUser = ${id}`,
         {
+          replacements: [id],
           type: QueryTypes.SELECT,
         },
       );
-      res.status(200).json({ activities: activities });
-    } catch {
-      res.status(400).json({ message: "Error" });
+      const userId = (activities[0] as any).id;
+      console.log(userId);
+      res.status(200).json({ atividades: activities, id: userId });
+    } catch(e:any){
+      res.status(400).json({ message: e.message });
     }
   }
 }

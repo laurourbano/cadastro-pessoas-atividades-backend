@@ -20,7 +20,8 @@ router.get("/activities/:id", ActivityController.getActivity);
 router.post("/activities", ActivityController.createActivity);
 router.put("/activities/:id", ActivityController.updateActivity);
 router.delete("/activities/:id", ActivityController.deleteActivity);
-router.get("/activities/:id/users", ActivityController.listActivitiesByUser);
+
+router.get("/activities/user/:id", ActivityController.listActivitiesByUser);
 
 router.post("/login", LoginController.login);
 router.post("/logout", LoginController.logout);

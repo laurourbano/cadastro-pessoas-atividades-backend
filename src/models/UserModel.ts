@@ -12,6 +12,7 @@ interface UserInterface {
 export class UserModel extends Model<UserInterface> {
 
   password: string='';
+  id: number=0;
   public static initModel(sequelize: Sequelize): void {
     UserModel.init(
       {
