@@ -1,48 +1,40 @@
 import { Request, Response } from "express";
-import sequelize from "../database/conection";
+import { UserModel } from "../models/UserModel";
+import verifiquePassword from "../utils/verifiquePassword";
 import { QueryTypes } from "sequelize";
-import bcrypt from "bcrypt";
+import sequelize from "../database/conection";
 
 export class LoginController {
   static async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
       const user = await sequelize.query(
-        "SELECT * FROM users WHERE email = :email",
+        "SELECT * FROM users WHERE email = ?",
         {
-          replacements: { email },
+          replacements: [email],
           type: QueryTypes.SELECT,
-        }
+        },
       );
-      if (!user) {
-        res.status(400).json({ message: "Usuário não encontrado" });
-        return;
-      }
 
-      interface User {
-        password: string;
-      }
-
-      const match = await bcrypt.compare(
-        password.trim(),
-        (user[0] as User).password.trim()
+      const match = await verifiquePassword(
+        password,
+        (user[0] as UserModel).password,
       );
       if (!match) {
-        res.status(400).json({ message: "Dados inválidos" });
+        res.status(401).json({ message: "Invalid password" });
         return;
       }
-
-      res.status(200).json({ message: "sucesso" });
+      res.status(200).json({ message: "Login successful" });
     } catch (error: any) {
-      res.status(401).json("Error: ");
+      res.status(400).json({ error: error.message });
     }
   }
 
   static async logout(req: Request, res: Response): Promise<void> {
     try {
-      res.status(200).end();
+      res.status(200).json({ message: "Logout successful" });
     } catch (error: any) {
-      res.status(400).json(error);
+      res.status(400).json({ error });
     }
   }
 }

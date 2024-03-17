@@ -22,7 +22,7 @@ export class ActivityController {
         {
           replacements: [id],
           type: QueryTypes.SELECT,
-        }
+        },
       );
       res.status(200).json(activities);
     } catch (error: any) {
@@ -39,7 +39,7 @@ export class ActivityController {
         {
           replacements: [name, description, start_date, end_date, id],
           type: QueryTypes.UPDATE,
-        }
+        },
       );
       res.status(202).end();
     } catch (error: any) {
@@ -74,11 +74,32 @@ export class ActivityController {
         {
           replacements: activity,
           type: QueryTypes.INSERT,
-        }
+        },
       );
       res.status(201).json({ message: "Activity created successfully!" });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  }
+
+  static async listActivitiesByUser(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const activities = await sequelize.query(
+        `SELECT name, description, start_date, end_date
+        FROM activities ac
+        JOIN pessoaatividade pa ON(ac.id = pa.idActivity)
+        WHERE pa.idUser = ${id}`,
+        {
+          type: QueryTypes.SELECT,
+        },
+      );
+      res.status(200).json({ activities: activities });
+    } catch {
+      res.status(400).json({ message: "Error" });
     }
   }
 }

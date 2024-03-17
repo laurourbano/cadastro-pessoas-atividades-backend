@@ -8,7 +8,7 @@ export class UserController {
   static async generateToken(
     payload: { id: any; name: any },
     secret: any,
-    options: any
+    options: any,
   ) {
     return await jwt.sign(payload, secret, options);
   }
@@ -39,13 +39,13 @@ export class UserController {
   static async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { name, email, password } = req.body;
+      const { name, telefone, email, endereco, idActivities } = req.body;
       await sequelize.query(
-        "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?",
+        "UPDATE users SET name = ?, telefone = ?, email = ?, endereco = ?, idActivities = ? WHERE id = ?",
         {
-          replacements: [name, email, password, id],
+          replacements: [name, telefone, email, endereco, idActivities, id],
           type: QueryTypes.UPDATE,
-        }
+        },
       );
       res.status(204).end();
     } catch (error: any) {
@@ -83,9 +83,9 @@ export class UserController {
         {
           replacements: user,
           type: QueryTypes.INSERT,
-        }
+        },
       );
-      res.status(201).end();
+      res.status(201).json({ message: "Usuário criado com sucesso" });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
